@@ -1,14 +1,7 @@
-from .common import parameters
+from .common import PhysicalParameters
 
 from .general_model import (
-    initial_conditions_general,
-    configuration_general,
-    solution_general,
+    InitialConditionsGeneralModel,
+    ConfigurationGeneralModel,
+    SolutionGeneralModel,
 )
-
-__all__ = [
-    'parameters',
-    'initial_conditions_general',
-    'configuration_general',
-    'solution_general',
-]

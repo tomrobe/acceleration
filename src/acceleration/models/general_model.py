@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import numpy as np
-from .common import parameters
+from .common import PhysicalParameters
 
 @dataclass
 class InitialConditionsGeneralModel:
@@ -11,7 +11,7 @@ class InitialConditionsGeneralModel:
 
 @dataclass
 class ConfigurationGeneralModel:
-    parameters: parameters
+    parameters: PhysicalParameters
     init: InitialConditionsGeneralModel
     t_span: tuple[float,float]
     t_eval: np.ndarray

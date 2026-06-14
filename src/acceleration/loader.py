@@ -21,9 +21,9 @@ def config_dict_to_simulation(config_dict, solver_type):
     t_eval = np.linspace(t_span[0], t_span[1],config_dict["time_span"]["n_points"])
 
     if solver_type == "general_model":
-        init = InitialConditionsGeneralModel(**config_dist["initial_conditions"])
+        init = InitialConditionsGeneralModel(**config_dict["initial_conditions"])
         return ConfigurationGeneralModel(
-            parameters=parameters,
+            parameters = parameters,
             init = init,
             t_span = t_span,
             t_eval = t_eval,

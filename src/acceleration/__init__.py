@@ -1,14 +1,10 @@
-from .models.common import parameters
-
-from .models.general_model import (
-    initial_conditions_general,
-    configuration_general,
-    solution_general,
+from .models import (
+    PhysicalParameters,
+    InitialConditionsGeneralModel,
+    ConfigurationGeneralModel,
+    SolutionGeneralModel,
 )
 
-__all__ = [
-    'parameters',
-    'initial_conditions_general',
-    'configuration_general',
-    'solution_general'
-]
+from .solvers.general_solver import solve, solve_multiple
+
+from .loader import load, run
