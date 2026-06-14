@@ -9,10 +9,10 @@
         "phi": 0.0
     },
     "initial_conditions": {
-        "rho": 1.0,
-        "drho": 1.0,
-        "theta": 1.0,
-        "dtheta": 1.0
+        "rho_0": 1.0,
+        "drho_0": 1.0,
+        "theta_0": 1.0,
+        "dtheta_0": 1.0
     },
     "time_span": {
         "start": 0.0,

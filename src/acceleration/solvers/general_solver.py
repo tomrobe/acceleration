@@ -48,4 +48,4 @@ def solve_multiple(configs):
         if not sol.success:
             print(f"Warning: solver did not converge for '{config.name}'")
         solutions.append(sol)
-    return solutiions
+    return solutions

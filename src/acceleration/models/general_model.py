@@ -17,10 +17,6 @@ class ConfigurationGeneralModel:
     t_eval: np.ndarray
     name: str = "unnamed"
 
-    def __post_init__(self):
-        if self.t_eval == None:
-            self.t_eval = np.linspace(self.t_span[0], self.t_span[1], 1001)
-
 @dataclass
 class SolutionGeneralModel:
     t: np.ndarray
