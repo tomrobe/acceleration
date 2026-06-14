@@ -1,6 +1,6 @@
-from .models.common import parameters
+from .common import parameters
 
-from .models.general_model import (
+from .general_model import (
     initial_conditions_general,
     configuration_general,
     solution_general,
@@ -10,5 +10,5 @@ __all__ = [
     'parameters',
     'initial_conditions_general',
     'configuration_general',
-    'solution_general'
+    'solution_general',
 ]
