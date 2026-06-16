@@ -19,5 +19,11 @@
         "end":      1.0,
         "n_points": 1001
     },
-    "sweep_type":   "single"
+    "sweep_type":   "sweep",
+    "sweep_config": {
+        "parameters": {
+            "parameters.m": [0.5,1.0,1.5],
+            "init.rho_0":   [0.5,1.0,1.5,2.0]
+        }
+    }
 }

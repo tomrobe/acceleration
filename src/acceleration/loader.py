@@ -1,6 +1,8 @@
 import json
 import numpy as np
 from pathlib import Path
+import itertools
+import copy
 
 from .models.common import PhysicalParameters
 from .models.general_model import InitialConditionsGeneralModel, ConfigurationGeneralModel
@@ -32,17 +34,42 @@ def config_dict_to_simulation(config_dict, solver_type):
     else:
         raise ValueError(f"Unknown solver_type: '{solver_type}'")
 
+def create_sweep(base_config, parameter_specs):
+    parameter_paths = list(parameter_specs.keys())
+    parameter_values = list(parameter_specs.values())
+
+    configs = []
+    for combination in itertools.product(*parameter_values):
+        config = copy.deepcopy(base_config)
+
+        name_parts = []
+        for path, val in zip(parameter_paths, combination):
+            parts = path.split(".")
+            obj = config
+            for part in parts[:-1]:
+                obj = getattr(obj, part)
+            setattr(obj, parts[-1], val)
+
+            name_parts.append(f"{parts[-1]}={val:.3g}")
+        
+        config.name = ", ".join(name_parts)
+        configs.append(config)
+
+    return configs
+
 def run(config_file, output_dir=Path("results")):
     # Load
     config = load(config_file)
 
     solver_type = config.get("solver_type")
-    config_base = config_dict_to_simulation(config, solver_type)
+    base_config = config_dict_to_simulation(config, solver_type)
 
     sweep_type = config["sweep_type"]
 
     if sweep_type == "single":
-        configs = [config_base]
+        configs = [base_config]
+    elif sweep_type == "sweep":
+        configs = create_sweep(base_config, config["sweep_config"]["parameters"])
     else:
         raise ValueError(f"Unknown sweep_type: '{sweep_type}'")
 
