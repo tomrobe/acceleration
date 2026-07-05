@@ -22,7 +22,9 @@
     "sweep_type":   "sweep",
     "sweep_config": {
         "parameters": {
-            "parameters.m": [-6,-1.333,-1],
+            "parameters.m": [-6,-1.333,-1]
+        },
+        "paired_parameters": {
             "init.drho_0":   [0.5,1.0,1.5,2.0],
             "init.theta_0":   [0.5,1.0,1.5,2.0]
         }

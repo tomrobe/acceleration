@@ -34,26 +34,56 @@ def config_dict_to_simulation(config_dict, solver_type):
     else:
         raise ValueError(f"Unknown solver_type: '{solver_type}'")
 
-def create_sweep(base_config, parameter_specs):
-    parameter_paths = list(parameter_specs.keys())
-    parameter_values = list(parameter_specs.values())
+def create_sweep(base_config, parameter_specs, paired_parameter_specs):
+    def set_parameter(config, path, val):
+        parts = path.split(".")
+        obj = config
+        for part in parts[:-1]:
+            obj = getattr(obj, part)
+        setattr(obj, parts[-1], val)
+
+    if paired_parameter_specs is not None:
+        paired_paths = list(paired_parameter_specs.keys())
+        paired_values = list(paired_parameter_specs.values())
+
+        lengths = [len(v) for v in paired_values]
+        if len(set(lengths)) > 1:
+            raise ValueError(
+                f"all paired parameters must have the same number of values. "
+                f"Got lengths: {dict(zip(paired_paths, lengths))}"
+            )
+
+        paired_combinations = list(zip(*paired_values))
+
+    else:
+        paired_paths = []
+        paired_combinations = [()]
+
+    if parameter_specs:
+        independent_paths = list(parameter_specs.keys())
+        independent_values = list(parameter_specs.values())
+        independent_combinations = list(itertools.product(*independent_values))
+    else:
+        independent_paths = []
+        independent_combinations = [()]
 
     configs = []
-    for combination in itertools.product(*parameter_values):
-        config = copy.deepcopy(base_config)
+    for independent_combo in independent_combinations:
+        for paired_combo in paired_combinations:
+            config = copy.deepcopy(base_config)
 
-        name_parts = []
-        for path, val in zip(parameter_paths, combination):
-            parts = path.split(".")
-            obj = config
-            for part in parts[:-1]:
-                obj = getattr(obj, part)
-            setattr(obj, parts[-1], val)
+            name_parts = []
 
-            name_parts.append(f"{parts[-1]}={val:.3g}")
-        
-        config.name = ", ".join(name_parts)
-        configs.append(config)
+            for path, val in zip(independent_paths, independent_combo):
+                set_parameter(config, path, val)
+                name_parts.append(f"{path.split('.')[-1]}={val:.3g}")
+
+            for path, val in zip(paired_paths, paired_combo):
+                set_parameter(config, path, val)
+                name_parts.append(f"{path.split('.')[-1]}={val:.3g}")
+            
+            config.name = ", ".join(name_parts)
+            configs.append(config)
 
     return configs
 
@@ -69,7 +99,11 @@ def run(config_file, output_dir=Path("results")):
     if sweep_type == "single":
         configs = [base_config]
     elif sweep_type == "sweep":
-        configs = create_sweep(base_config, config["sweep_config"]["parameters"])
+        configs = create_sweep(
+            base_config, 
+            parameter_specs=config["sweep_config"].get("parameters", {}),
+            paired_parameter_specs=config["sweep_config"].get("paired_parameters", None)
+        )
     else:
         raise ValueError(f"Unknown sweep_type: '{sweep_type}'")
 
