@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from .analysis import general_model as analysis_general
+from .analysis import yf_model as analysis_yf
 
 plt.rcParams.update({
     "font.family": "serif",
@@ -249,6 +250,128 @@ def plot_w(solutions, figsize=None):
             
             x_func = sol.t
             y_func = analysis_general.compute_w(sol)
+            ax.plot(x_func, y_func, label=label, color=color, alpha=0.8)
+
+        subplot_name = subplot_parameter.split(".")[-1]
+        ax.set_ylabel(y_label)
+        ax.set_yticks([-1,1])
+        axes[-1].set_xlabel(x_label)
+
+    plt.tight_layout()
+    if filename:
+        plt.savefig(filename+'.pdf', dpi=250, format='pdf')
+    plt.show()
+
+def plot_epsilons(solutions, figsize=None):
+    subplot_parameter = "parameters.m"
+    line_parameters = ["init.y_0","init.f_0"]
+#    x_func = sol.theta
+#    y_func = analysis_general.compute_y(sol)
+    x_label = r'$\Delta N$'
+    y_label = r''
+    filename = "epsilons"
+
+    def get_parameter(sol, parameter_path):
+        parts = parameter_path.split(".")
+        obj = sol.config
+        for part in parts:
+            obj = getattr(obj, part)
+        return obj
+
+    subplot_values = sorted(set(get_parameter(sol, subplot_parameter) for sol in solutions))
+
+    groups = {}
+    for sol in solutions:
+        key = get_parameter(sol, subplot_parameter)
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(sol)
+
+    n = len(subplot_values)
+    if figsize is None:
+        figsize = (4,1.5*n)
+    fig, axes = plt.subplots(n, 1, figsize=figsize, sharex=True)
+
+    if n == 1:
+        axes = [axes]
+
+    for ax, subplot_val in zip(axes, subplot_values):
+
+        colormap = plt.get_cmap("Greys_r")
+        n_lines = len(groups[subplot_val])
+        values = np.linspace(0.0,0.8,n_lines)
+        colors = [colormap(v) for v in values]
+
+        for sol, color in zip(groups[subplot_val], colors):
+            label = ", ".join(
+                f"{p.split('.')[-1]}={get_parameter(sol, p):.3g}"
+                for p in line_parameters
+            )
+            
+            x_func = analysis_yf.compute_delta_N(sol)
+            y_func_1 = analysis_yf.compute_epsilon1(sol)
+            y_func_2 = analysis_yf.compute_epsilon2(sol)
+            ax.plot(x_func, y_func_1, label=label, linestyle='--', color=color, alpha=0.8)
+            ax.plot(x_func, y_func_2, label=label, color=color, alpha=0.8)
+
+        subplot_name = subplot_parameter.split(".")[-1]
+        ax.set_ylabel(y_label)
+        ax.set_yticks([-1,1])
+        axes[-1].set_xlabel(x_label)
+
+    plt.tight_layout()
+    if filename:
+        plt.savefig(filename+'.pdf', dpi=250, format='pdf')
+    plt.show()
+
+def plot_potential(solutions, figsize=None):
+    subplot_parameter = "parameters.m"
+    line_parameters = ["init.y_0","init.f_0"]
+#    x_func = sol.theta
+#    y_func = analysis_general.compute_y(sol)
+    x_label = r''
+    y_label = r'$V_{\phi}/V_{0}$'
+    filename = "potential"
+
+    def get_parameter(sol, parameter_path):
+        parts = parameter_path.split(".")
+        obj = sol.config
+        for part in parts:
+            obj = getattr(obj, part)
+        return obj
+
+    subplot_values = sorted(set(get_parameter(sol, subplot_parameter) for sol in solutions))
+
+    groups = {}
+    for sol in solutions:
+        key = get_parameter(sol, subplot_parameter)
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(sol)
+
+    n = len(subplot_values)
+    if figsize is None:
+        figsize = (4,3.5*n)
+    fig, axes = plt.subplots(n, 1, figsize=figsize, sharex=True)
+
+    if n == 1:
+        axes = [axes]
+
+    for ax, subplot_val in zip(axes, subplot_values):
+
+        colormap = plt.get_cmap("Greys_r")
+        n_lines = len(groups[subplot_val])
+        values = np.linspace(0.0,0.8,n_lines)
+        colors = [colormap(v) for v in values]
+
+        for sol, color in zip(groups[subplot_val], colors):
+            label = ", ".join(
+                f"{p.split('.')[-1]}={get_parameter(sol, p):.3g}"
+                for p in line_parameters
+            )
+            
+            x_func = analysis_yf.compute_field(sol)
+            y_func = analysis_yf.compute_potential(sol)
             ax.plot(x_func, y_func, label=label, color=color, alpha=0.8)
 
         subplot_name = subplot_parameter.split(".")[-1]

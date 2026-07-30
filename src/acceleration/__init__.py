@@ -3,6 +3,9 @@ from .models import (
     InitialConditionsGeneralModel,
     ConfigurationGeneralModel,
     SolutionGeneralModel,
+    InitialConditionsYFModel,
+    ConfigurationYFModel,
+    SolutionYFModel,
 )
 
 from .solvers.general_solver import solve, solve_multiple

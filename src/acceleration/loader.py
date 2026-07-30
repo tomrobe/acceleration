@@ -6,8 +6,9 @@ import copy
 
 from .models.common import PhysicalParameters
 from .models.general_model import InitialConditionsGeneralModel, ConfigurationGeneralModel
+from .models.yf_model import InitialConditionsYFModel,ConfigurationYFModel
 
-from .solvers import general_solver
+from .solvers import general_solver, yf_solver
 
 def load(config_file):
     with open(config_file, 'r') as f:
@@ -25,6 +26,15 @@ def config_dict_to_simulation(config_dict, solver_type):
     if solver_type == "general_model":
         init = InitialConditionsGeneralModel(**config_dict["initial_conditions"])
         return ConfigurationGeneralModel(
+            parameters = parameters,
+            init = init,
+            t_span = t_span,
+            t_eval = t_eval,
+            name = config_dict["name"],
+        )
+    elif solver_type == "yf_model":
+        init = InitialConditionsYFModel(**config_dict["initial_conditions"])
+        return ConfigurationYFModel(
             parameters = parameters,
             init = init,
             t_span = t_span,
@@ -110,6 +120,8 @@ def run(config_file, output_dir=Path("results")):
     # Solve
     if solver_type == "general_model":
         solutions = general_solver.solve_multiple(configs)
+    elif solver_type == "yf_model":
+        solutions = yf_solver.solve_multiple(configs)
     else:
         solutions = False
 

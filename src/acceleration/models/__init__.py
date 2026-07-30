@@ -5,3 +5,9 @@ from .general_model import (
     ConfigurationGeneralModel,
     SolutionGeneralModel,
 )
+
+from .yf_model import (
+    InitialConditionsYFModel,
+    ConfigurationYFModel,
+    SolutionYFModel,
+)
